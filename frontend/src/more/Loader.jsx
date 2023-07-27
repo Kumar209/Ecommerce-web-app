@@ -5,7 +5,7 @@ const Loading = () => {
   return (
     <div className="loading">
       <input type="checkbox" id="check" />
-      <label for="check">
+      <label htmlFor="check">
         <div className="check-icon"></div>
       </label>
     </div>

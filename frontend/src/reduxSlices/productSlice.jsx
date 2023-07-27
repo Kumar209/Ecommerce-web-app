@@ -1,47 +1,62 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { backend_Url } from "../server";
 
 // Async Thunks
-export const getProductDetails = createAsyncThunk(
-  "product/getProductDetails",
-  async (id) => {
+
+export const getProduct = createAsyncThunk(
+  "product/getProduct", async (data ,{ rejectWithValue }) => {
     try {
-      const response = await axios.get(`/api/v2/product/${id}`);
-      return response.data.product;
+      const currentPage = data.currentPage;
+      const keyword = data.keyword || "";
+      const category = data.category;
+
+      const link = category
+        ? `${backend_Url}/products?keyword=${keyword}&page=${currentPage}&category=${category}`
+        : `${backend_Url}/products?keyword=${keyword}&page=${currentPage}`;
+
+      const response = await axios.get(link, {withCredentials: true});
+      return response.data;
     } catch (error) {
-      return error.response.message;
+      console.log(error);
+      return rejectWithValue(error.response.data.message);
     }
   }
 );
 
-// export const getProduct = createAsyncThunk('product/getProduct', async ({ keyword, currentPage, category }) => {
-export const getProduct = createAsyncThunk("product/getProduct", async () => {
-  try {
-    // const link = category
-    //   ? `/api/v2/products?keyword=${keyword}&page=${currentPage}&category=${category}`
-    //   : `/api/v2/products?keyword=${keyword}&page=${currentPage}`;
-
-    const link = `/api/v2/products`;
-    console.log("r");
-
-    const response = await axios.get(link);
-    return response.data;
-  } catch (error) {
-    return error.response.data.message;
+export const getAllProduct = createAsyncThunk(
+  "product/getAllProduct",
+  async (_, { rejectWithValue }) => {
+    try {
+      const link = `${backend_Url}/products`;
+      const response = await axios.get(link, {withCredentials: true});
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data.message);
+    }
   }
-});
+);
+
+export const getProductDetails = createAsyncThunk(
+  "product/getProductDetails",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${backend_Url}/product/${id}`, {withCredentials: true});
+      return response.data.product;
+    } catch (error) {
+      return rejectWithValue(error.response.message);
+    }
+  }
+);
 
 export const newReview = createAsyncThunk(
   "product/newReview",
   async (reviewData, { rejectWithValue }) => {
     try {
-      const config = {
-        headers: { "Content-Type": "application/json" },
-      };
       const response = await axios.post(
-        `/api/v2/product/review`,
-        reviewData,
-        config
+        `${backend_Url}/product/review`,
+        reviewData, 
+        {withCredentials: true}
       );
       return response.data.success;
     } catch (error) {
@@ -58,9 +73,10 @@ export const createProduct = createAsyncThunk(
         headers: { "Content-Type": "application/json" },
       };
       const response = await axios.post(
-        `/api/v2/product/new`,
+        `${backend_Url}/product/new`,
         productData,
-        config
+        config,
+        {withCredentials: true}
       );
       return response.data;
     } catch (error) {
@@ -73,7 +89,7 @@ export const getAdminProduct = createAsyncThunk(
   "product/getAdminProduct",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get("/api/v2/admin/products");
+      const response = await axios.get(`${backend_Url}/admin/products` ,{withCredentials: true});
       return response.data.products;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -85,7 +101,7 @@ export const deleteProduct = createAsyncThunk(
   "product/deleteProduct",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.delete(`/api/v2/product/${id}`);
+      const response = await axios.delete(`${backend_Url}/product/${id}`, {withCredentials: true});
       return response.data.success;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -101,9 +117,10 @@ export const updateProduct = createAsyncThunk(
         headers: { "Content-Type": "application/json" },
       };
       const response = await axios.put(
-        `/api/v2/product/${id}`,
+        `${backend_Url}/product/${id}`,
         productData,
-        config
+        config,
+        {withCredentials: true}
       );
       return response.data.success;
     } catch (error) {
@@ -116,7 +133,7 @@ export const getAllReviews = createAsyncThunk(
   "product/getAllReviews",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`/api/v2/reviews?id=${id}`);
+      const response = await axios.get(`${backend_Url}/reviews?id=${id}`, {withCredentials: true});
       return response.data.reviews;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -129,7 +146,7 @@ export const deleteReviews = createAsyncThunk(
   async ({ reviewId, productId }, { rejectWithValue }) => {
     try {
       const response = await axios.delete(
-        `/api/v2/reviews?id=${reviewId}&productId=${productId}`
+        `${backend_Url}/reviews?id=${reviewId}&productId=${productId}`, {withCredentials: true}
       );
       return response.data.success;
     } catch (error) {
@@ -153,6 +170,9 @@ const productSlice = createSlice({
     clearErrors: (state) => {
       state.error = null;
     },
+    NEW_REVIEW_RESET: (state) => {
+      state.success = false;
+    },
   },
   extraReducers: (builder) => {
     // Get Product
@@ -169,6 +189,24 @@ const productSlice = createSlice({
         state.filteredProductsCount = action.payload.filteredProductsCount;
       })
       .addCase(getProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    //Get all products
+    builder
+      .addCase(getAllProduct.pending, (state) => {
+        state.loading = true;
+        state.products = [];
+      })
+      .addCase(getAllProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.products = action.payload.products;
+        state.productsCount = action.payload.productsCount;
+        state.resultPerPage = action.payload.resultPerPage;
+        state.filteredProductsCount = action.payload.filteredProductsCount;
+      })
+      .addCase(getAllProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
@@ -201,9 +239,6 @@ const productSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
-    // .addCase(newReview.reset, (state)=>{
-    //   state.success = false;
-    // });
 
     // Create Product
     builder
@@ -298,5 +333,5 @@ const productSlice = createSlice({
   },
 });
 
-export const { clearErrors } = productSlice.actions;
+export const { clearErrors, NEW_REVIEW_RESET } = productSlice.actions;
 export default productSlice.reducer;

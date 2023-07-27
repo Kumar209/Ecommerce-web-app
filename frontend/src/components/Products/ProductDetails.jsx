@@ -1,41 +1,40 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-lone-blocks */
 import React, { useEffect, useState } from "react";
-import Carousel from "react-material-ui-carousel";
+// import Carousel from "react-material-ui-carousel";
 import { useDispatch, useSelector } from "react-redux";
+
+import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
+import { Carousel } from "react-responsive-carousel";
 
 import {
   clearErrors,
   getProductDetails,
   newReview,
+  NEW_REVIEW_RESET,
 } from "../../reduxSlices/productSlice";
 import { addItemsToCart } from "../../reduxSlices/cartSlice";
 import { addFavouriteItemsToCart } from "../../reduxSlices/favouriteSlice";
-
 import Footer from "../../Footer";
 import MetaData from "../../more/Metadata";
 import Header from "../Home/Header";
-import "./Productdetails.css";
-
-import Rating from "@mui/material/Rating";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import Rating from "@mui/material/Rating";
+import { Rating } from "@material-ui/lab";
+import { toast } from "react-toastify";
 import ReviewCard from "./ReviewCard.jsx";
-// import { NEW_REVIEW_RESET } from "../../constans/ProductConstans";
 import BottomTab from "../../more/BottomTab";
 import Loading from "../../more/Loader";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import "./Productdetails.css";
 
-const ProductDetails = ({ match, history }) => {
+const ProductDetails = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { id } = useParams();
 
-  const { product, loading, error } = useSelector(
-    (state) => state.products
-  );
+  const { product, loading, error } = useSelector((state) => state.products);
 
-
-  //   const { isAuthenticated } = useSelector((state) => state.user);
+  const { isAuthenticated } = useSelector((state) => state.user);
 
   const reviewSubmitHandler = (e) => {
     e.preventDefault();
@@ -44,22 +43,21 @@ const ProductDetails = ({ match, history }) => {
 
     myForm.set("rating", rating);
     myForm.set("comment", comment);
-    myForm.set("productId", match.params.id);
+    myForm.set("productId", id);
 
-    // {
-    //   isAuthenticated !== true ? history.push(`/login?redirect=/`) : <></>;
-    // }
+    if (!isAuthenticated) {
+      navigate("/login");
+    } else {
+      dispatch(newReview(myForm));
 
-    dispatch(newReview(myForm));
+      {
+        comment.length === 0
+          ? toast.error("Please fill the comment box")
+          : toast.success("Review done successfully reload for watch it");
+      }
 
-    {
-      comment.length === 0
-        ? toast.error("Please fill the comment box")
-        : toast.success("Review done successfully reload for watch it");
+      dispatch(NEW_REVIEW_RESET());
     }
-
-    // dispatch({ type: NEW_REVIEW_RESET });
-    // dispatch(newReview.reset);
   };
 
   useEffect(() => {
@@ -67,12 +65,8 @@ const ProductDetails = ({ match, history }) => {
       alert.error(error);
       dispatch(clearErrors());
     }
-    // dispatch(getProductDetails(match.params.id));
     dispatch(getProductDetails(id));
-//   }, [dispatch, match.params.id, error, alert]);
-  }, [dispatch, error]);
-
-
+  }, [dispatch, toast, error]);
 
   const options = {
     value: product.ratings,
@@ -100,7 +94,7 @@ const ProductDetails = ({ match, history }) => {
 
   const addToCartHandler = () => {
     if (product.Stock > 0) {
-      dispatch(addItemsToCart(match.params.id, quantity));
+      dispatch(addItemsToCart({ id, quantity }));
       toast.success("Product Added to cart");
     } else {
       toast.error("Product stock limited");
@@ -108,7 +102,7 @@ const ProductDetails = ({ match, history }) => {
   };
 
   const addToFavouriteHandler = () => {
-    dispatch(addFavouriteItemsToCart(match.params.id, quantity));
+    dispatch(addFavouriteItemsToCart({ id, quantity }));
     toast.success("Product Added to Favourites");
   };
 
@@ -148,9 +142,9 @@ const ProductDetails = ({ match, history }) => {
 
               <div className="detailsBlock">
                 <div style={{ display: "flex" }}>
-                  <h1>{`$${product.price}`}</h1>
+                  <h1>{`₹${product.price}`}</h1>
                   <h1 className="discountPrice">
-                    {product.offerPrice > 0 ? `$${product.offerPrice}` : ""}
+                    {product.offerPrice > 0 ? `₹${product.offerPrice}` : ""}
                   </h1>
                 </div>
 
@@ -242,7 +236,7 @@ const ProductDetails = ({ match, history }) => {
               </div>
             </div>
           </div>
-          
+
           {/* Review Heading */}
           <div className="reviews__heading">
             <h1
@@ -257,16 +251,15 @@ const ProductDetails = ({ match, history }) => {
             </h1>
           </div>
 
-           {/* Reviews */}
+          {/* Reviews */}
           <div>
-            <div style={{ padding: "1vmax",}} >
-
+            <div style={{ padding: "1vmax" }}>
               {/* {product.reviews && product.reviews[0] ? ( */}
               {product.reviews ? (
                 <div className="review__option">
                   {product.reviews &&
-                    product.reviews.map((review) => (
-                      <ReviewCard review={review} />
+                    product.reviews.map((review, index) => (
+                      <ReviewCard review={review} key={index} />
                     ))}
                 </div>
               ) : (
@@ -369,17 +362,6 @@ const ProductDetails = ({ match, history }) => {
             </div>
           </div>
 
-          <ToastContainer
-            position="top-center"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
           <Footer />
           <BottomTab />
         </>

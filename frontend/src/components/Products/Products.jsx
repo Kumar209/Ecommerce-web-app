@@ -7,10 +7,11 @@ import ProductCard from "./ProductCard";
 import { clearErrors, getProduct } from "../../reduxSlices/productSlice";
 import Pagination from "react-js-pagination";
 import "./Products.css";
-import Typography from '@mui/material/Typography';
-// import { useAlert } from "react-alert";
+import Typography from "@mui/material/Typography";
 import MetaData from "../../more/Metadata";
 import BottomTab from "../../more/BottomTab";
+import { toast } from "react-toastify";
+import { useParams} from "react-router-dom";
 
 const categories = [
   "Personal",
@@ -18,12 +19,12 @@ const categories = [
   "Ladies Cloth",
   "Gift",
   "Food",
-  "Electronics",
+  "Electronic",
   "Sports",
   "Others",
 ];
 
-const Products = ({ match }) => {
+const Products = () => {
   const dispatch = useDispatch();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -32,7 +33,10 @@ const Products = ({ match }) => {
 
   const { products, loading, error, productsCount, resultPerPage } = useSelector((state) => state.products);
 
-  const keyword = match.params.keyword;
+
+  const { keyword } = useParams();
+
+
 
   const setCurrentPageNo = (e) => {
     setCurrentPage(e);
@@ -40,11 +44,10 @@ const Products = ({ match }) => {
 
   useEffect(() => {
     if (error) {
-      alert(error);
+      toast.error(error);
       dispatch(clearErrors());
     }
-    dispatch(getProduct(keyword, currentPage, category));
-  // }, [dispatch, keyword, currentPage, category, alert, error]);
+    dispatch(getProduct({keyword, currentPage, category}));
   }, [dispatch, keyword, currentPage, category, error]);
 
   return (
@@ -153,7 +156,7 @@ const Products = ({ match }) => {
               <Pagination
                 activePage={currentPage}
                 itemsCountPerPage={resultPerPage}
-                totalItemsCount={productsCount}
+                totalItemsCount={productsCount || 1}
                 onChange={setCurrentPageNo}
                 nextPageText="Next"
                 prevPageText="Prev"

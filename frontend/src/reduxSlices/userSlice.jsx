@@ -1,12 +1,20 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { backend_Url } from "../server";
 
 // Async Thunks
 export const login = createAsyncThunk(
   "user/login",
-  async ({ email, password }, { rejectWithValue }) => {
+  async (formData, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/api/v2/login", { email, password });
+      const Data = {
+        email: formData.get("email"),
+        password: formData.get("password"),
+      };
+
+      const response = await axios.post(`${backend_Url}/login`, Data, {
+        withCredentials: true,
+      });
       return response.data.user;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -18,9 +26,26 @@ export const register = createAsyncThunk(
   "user/register",
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/api/v2/registration", userData);
+      const Data = {
+        name: userData.get("name"),
+        email: userData.get("email"),
+        password: userData.get("password"),
+        avatar: userData.get("avatar"),
+      };
+
+      const config = { headers: { "Content-Type": "multipart/form-data" } };
+
+      const response = await axios.post(
+        `${backend_Url}/registration`,
+        Data,
+        config,
+        {
+          withCredentials: true,
+        }
+      );
       return response.data.user;
     } catch (error) {
+      console.log(error);
       return rejectWithValue(error.response.data.message);
     }
   }
@@ -30,7 +55,9 @@ export const loadUser = createAsyncThunk(
   "user/loadUser",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get("/api/v2/me");
+      const response = await axios.get(`${backend_Url}/me`, {
+        withCredentials: true,
+      });
       return response.data.user;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -42,7 +69,7 @@ export const logout = createAsyncThunk(
   "user/logout",
   async (_, { rejectWithValue }) => {
     try {
-      await axios.get("/api/v2/logout");
+      await axios.get(`${backend_Url}/logout`, { withCredentials: true });
     } catch (error) {
       return rejectWithValue(error.response.data.message);
     }
@@ -52,8 +79,21 @@ export const logout = createAsyncThunk(
 export const updateProfile = createAsyncThunk(
   "user/updateProfile",
   async (userData, { rejectWithValue }) => {
+    const data = {
+      name: userData.get("name"),
+      email: userData.get("email"),
+      avatar: userData.get("avatar")
+    };
+
     try {
-      const response = await axios.put("/api/v2/me/update/info", userData);
+      const config = { headers: { "Content-Type": "multipart/form-data" } };
+
+      const response = await axios.put(
+        `${backend_Url}/me/update/info`,
+        data,
+        { withCredentials: true },
+        config
+      );
       return response.data.success;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -65,7 +105,15 @@ export const updatePassword = createAsyncThunk(
   "user/updatePassword",
   async (password, { rejectWithValue }) => {
     try {
-      const response = await axios.put("/api/v2/me/update", password);
+      const data = {
+        oldPassword: password.get("oldPassword"),
+        newPassword: password.get("newPassword"),
+        confirmPassword: password.get("confirmPassword"),
+      };
+
+      const response = await axios.put(`${backend_Url}/me/update`, data, {
+        withCredentials: true,
+      });
       return response.data.success;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -77,7 +125,7 @@ export const getAllUsers = createAsyncThunk(
   "user/getAllUsers",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get("/api/v2/admin/users");
+      const response = await axios.get(`${backend_Url}/admin/users`, {withCredentials: true});
       return response.data.users;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -89,7 +137,7 @@ export const forgotPassword = createAsyncThunk(
   "user/forgotPassword",
   async (email, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/api/v2/password/forgot", email);
+      const response = await axios.post(`${backend_Url}/password/forgot`, email ,{withCredentials: true});
       return response.data.message;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -102,8 +150,9 @@ export const resetPassword = createAsyncThunk(
   async ({ token, passwords }, { rejectWithValue }) => {
     try {
       const response = await axios.put(
-        `/api/v2/password/reset/${token}`,
-        passwords
+        `${backend_Url}/password/reset/${token}`,
+        passwords,
+        {withCredentials: true}
       );
       return response.data.success;
     } catch (error) {
@@ -116,7 +165,7 @@ export const deleteUser = createAsyncThunk(
   "user/deleteUser",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.delete(`/api/v2/admin/user/${id}`);
+      const response = await axios.delete(`${backend_Url}/admin/user/${id}` , {withCredentials: true});
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -128,7 +177,7 @@ export const getUserDetails = createAsyncThunk(
   "user/getUserDetails",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`/api/v2/admin/user/${id}`);
+      const response = await axios.get(`${backend_Url}/admin/user/${id}`, {withCredentials:true});
       return response.data.user;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -140,7 +189,7 @@ export const updateUser = createAsyncThunk(
   "user/updateUser",
   async ({ id, userData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`/api/v2/admin/user/${id}`, userData);
+      const response = await axios.put(`${backend_Url}/admin/user/${id}`, userData, {withCredentials: true});
       return response.data.success;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -162,6 +211,13 @@ const userSlice = createSlice({
   reducers: {
     clearErrors: (state) => {
       state.error = null;
+    },
+
+    UPDATE_PASSWORD_RESET: (state) => {
+      state.isUpdated = false;
+    },
+    UPDATE_PROFILE_RESET: (state) => {
+      state.isUpdated = false;
     },
   },
   extraReducers: (builder) => {
@@ -234,8 +290,8 @@ const userSlice = createSlice({
       })
       .addCase(updateProfile.fulfilled, (state, action) => {
         state.loading = false;
-         // Reset isUpdated to false if the payload is not truth
-         if (!action.payload) {
+        // Reset isUpdated to false if the payload is not truth
+        if (!action.payload) {
           state.isUpdated = false;
         }
 
@@ -262,7 +318,10 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+      // .addCase(updatePassword.UPDATE_PASSWORD_RESET, (state) => {
+
+      // })
+
       .addCase(deleteUser.pending, (state) => {
         state.loading = true;
       })
@@ -270,8 +329,8 @@ const userSlice = createSlice({
         state.loading = false;
         state.isDeleted = action.payload.success;
 
-         // Reset isUpdated to false if the payload is not truthy
-         if (!action.payload) {
+        // Reset isUpdated to false if the payload is not truthy
+        if (!action.payload) {
           state.isDeleted = false;
         }
       })
@@ -290,10 +349,10 @@ const userSlice = createSlice({
       // })
       .addCase(updateUser.fulfilled, (state) => {
         state.isUpdated = false;
-      })
-      // .addCase(deleteUser.fulfilled, (state) => {
-      //   state.isDeleted = false;
-      // });
+      });
+    // .addCase(deleteUser.fulfilled, (state) => {
+    //   state.isDeleted = false;
+    // });
 
     // Get All Users
     builder
@@ -357,5 +416,6 @@ const userSlice = createSlice({
   },
 });
 
-export const { clearErrors } = userSlice.actions;
+export const { clearErrors, UPDATE_PASSWORD_RESET, UPDATE_PROFILE_RESET } =
+  userSlice.actions;
 export default userSlice.reducer;

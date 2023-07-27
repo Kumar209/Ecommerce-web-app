@@ -4,6 +4,7 @@
     width: 100%;
     height: 60px;
     bottom: 0;
+    /* top: 0; */
     display: flex;
     align-items: center;
     justify-content: space-around;
@@ -13,4 +14,11 @@
 }
 .icon{
     display: flex;
+}
+
+
+@media (min-width: 768px) {
+    .bottomOption{
+        display: none;
+    }
 }

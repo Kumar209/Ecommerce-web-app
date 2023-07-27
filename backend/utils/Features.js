@@ -2,8 +2,8 @@
 
 class Features {
     constructor(query,queryStr){
-        this.query = query;
-        this.queryStr = queryStr;
+        this.query = query;                  //find
+        this.queryStr = queryStr;            //personal
     }
 
     search() {
@@ -16,7 +16,7 @@ class Features {
         :{
 
         }
-        console.log(keyword);
+
         this.query = this.query.find({...keyword});
         return this;
     }

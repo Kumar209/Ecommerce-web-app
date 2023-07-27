@@ -5,13 +5,13 @@ import bg from "../../Assets/background.jpg";
 import bg2 from "../../Assets/background2.jpg";
 import ProductCard from "../Products/ProductCard.jsx";
 import { useDispatch, useSelector } from "react-redux";
-import { clearErrors, getProduct } from "../../reduxSlices/productSlice";
+import { clearErrors, getAllProduct } from "../../reduxSlices/productSlice";
 import Header from "./Header";
 import MetaData from "../../more/Metadata.jsx";
 import Footer from "../../Footer.jsx";
 import BottomTab from "../../more/BottomTab.jsx";
 import Loading from "../../more/Loader.jsx";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Home = () => {
@@ -23,7 +23,7 @@ const Home = () => {
       toast.error(error);
       dispatch(clearErrors());
     }
-    dispatch(getProduct());
+    dispatch(getAllProduct());
   }, [dispatch, error]);
 
   return (
@@ -34,6 +34,7 @@ const Home = () => {
         <>
           <MetaData title="Home" />
           <Header />
+
 
           {/* Carousel */}
           <div className="banner">
@@ -144,18 +145,6 @@ const Home = () => {
                 <ProductCard key={product._id} product={product} />
               ))}
           </div>
-
-          <ToastContainer
-            position="bottom-center"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
 
           <Footer />
 

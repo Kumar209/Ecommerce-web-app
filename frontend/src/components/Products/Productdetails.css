@@ -12,14 +12,16 @@ input {
     outline: none;
 }
 
+
+
+.first__varse {
+    margin: auto;
+}
+
 img.CarouselImage {
     width: 350px;
     height: 350px;
     object-fit: contain;
-}
-
-.first__varse {
-    margin: auto;
 }
 
 .varse__2 {
@@ -32,6 +34,9 @@ img.CarouselImage {
     align-items: center !important;
     display: flex !important;
 }
+
+
+
 
 .detailsBlock-1>h2 {
     padding: 5px 0px;
@@ -128,4 +133,10 @@ input[type="number"] {
     .first__varse {
         margin: unset !important;
     }
+}
+
+
+
+.css-1f8sh1y{
+    width: 300px;
 }

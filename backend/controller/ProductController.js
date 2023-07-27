@@ -2,7 +2,7 @@ const Product = require("../models/ProductModel.js");
 const ErrorHandler = require("../utils/ErrorHandler.js");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors.js");
 const Features = require("../utils/Features");
-// const cloudinary = require("cloudinary");
+const cloudinary = require("cloudinary");
 
 // create Product --Admin
 exports.createProduct = catchAsyncErrors(async (req, res, next) => {
@@ -143,6 +143,7 @@ exports.getAllProducts = catchAsyncErrors(async (req, res) => {
 //     message: "Product deleted succesfully",
 //   });
 // });
+
 
 // single Product details
 exports.getSingleProduct = catchAsyncErrors(async (req, res, next) => {

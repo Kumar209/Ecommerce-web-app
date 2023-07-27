@@ -1,9 +1,9 @@
-require('dotenv').config({path: "./config/.env"})
+require('dotenv').config({path: "./config/.env"});
 const app = require("./app");
 const port = process.env.PORT || 5000;
 var colors = require('colors');
 const connectDatabase = require("./db/Database.js");
-// const cloudinary = require("cloudinary");
+const cloudinary = require("cloudinary");
 
 // Handling uncaught Exception  like you have written sdkfjl in any of the file
 process.on("uncaughtException",(err) =>{
@@ -20,11 +20,11 @@ process.on("uncaughtException",(err) =>{
 // connect database
 connectDatabase();
 
-// cloudinary.config({
-//     cloud_name: process.env.CLOUDINARY_NAME,
-//     api_key: process.env.CLOUDINARY_API_KEY,
-//     api_secret: process.env.CLOUDINARY_API_SECRET
-// })
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+})
 
 // create server
 const server = app.listen(port ,() =>{

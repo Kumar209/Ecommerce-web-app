@@ -29,11 +29,13 @@ const orderSchema = new mongoose.Schema({
   },
   orderItems: [
     {
-      productName: {
+      // productName: {
+        name:{
         type: String,
         required: true,
       },
-      productPrice: {
+      // productPrice: {
+      price: {
         type: Number,
         required: true,
       },
@@ -41,11 +43,13 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true,
       },
-      productImage: {
+      // productImage: {
+      image: {
         type: String,
         required: true,
       },
-      productId: {
+      // productId: {
+      product: {
         type: mongoose.Schema.ObjectId,
         ref: "Product",
         required: true,

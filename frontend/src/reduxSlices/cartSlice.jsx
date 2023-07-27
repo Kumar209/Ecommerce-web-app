@@ -1,11 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { backend_Url } from "../server";
 
 export const addItemsToCart = createAsyncThunk(
   "cart/addToCart",
-  async (id, quantity, { getState, rejectWithValue }) => {
+  async ({ id, quantity }, { rejectWithValue }) => {
     try {
-      const { data } = await axios.get(`/api/v2/product/${id}`);
+      const { data } = await axios.get(`${backend_Url}/product/${id}`, {
+        withCredentials: true,
+      });
 
       return {
         product: data.product._id,
@@ -15,21 +18,27 @@ export const addItemsToCart = createAsyncThunk(
         stock: data.product.Stock,
         quantity,
       };
+
+      // localStorage.setItem("cartItems", JSON.stringify(getState().cart.cartItems));
     } catch (error) {
       // Handle the error or return a rejected promise with error value
-      return rejectWithValue(error.response.data.message || "Failed to add item to cart.");
+      return rejectWithValue(
+        error.response.data.message || "Failed to add item to cart."
+      );
     }
   }
 );
 
 export const removeItemsFromCart = createAsyncThunk(
   "cart/removeFromCart",
-  async (id, { getState, rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
       return id;
     } catch (error) {
       // Handle the error or return a rejected promise with error value
-      return rejectWithValue(error.response.data.message || "Failed to remove item from cart.");
+      return rejectWithValue(
+        error.response.data.message || "Failed to remove item from cart."
+      );
     }
   }
 );
@@ -41,7 +50,9 @@ export const saveShippingInfo = createAsyncThunk(
       return data;
     } catch (error) {
       // Handle the error or return a rejected promise with error value
-      return rejectWithValue(error.response.data.message || "Failed to save shipping info.");
+      return rejectWithValue(
+        error.response.data.message || "Failed to save shipping info."
+      );
     }
   }
 );
@@ -54,6 +65,7 @@ const cartSlice = createSlice({
     builder
       .addCase(addItemsToCart.fulfilled, (state, action) => {
         const item = action.payload;
+
         const isItemExist = state.cartItems.find(
           (i) => i.product === item.product
         );
@@ -65,13 +77,24 @@ const cartSlice = createSlice({
         } else {
           state.cartItems.push(item);
         }
+
+        localStorage.setItem("cartItems", JSON.stringify(state.cartItems));
       })
+
       .addCase(removeItemsFromCart.fulfilled, (state, action) => {
         const id = action.payload;
         state.cartItems = state.cartItems.filter((i) => i.product !== id);
+
+        localStorage.setItem("cartItems", JSON.stringify(state.cartItems));
       })
+
       .addCase(saveShippingInfo.fulfilled, (state, action) => {
         state.shippingInfo = action.payload;
+
+        localStorage.setItem(
+          "shippingInfo",
+          JSON.stringify(state.shippingInfo)
+        );
       });
   },
 });
