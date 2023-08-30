@@ -135,9 +135,9 @@ export const getAllUsers = createAsyncThunk(
 
 export const forgotPassword = createAsyncThunk(
   "user/forgotPassword",
-  async (email, { rejectWithValue }) => {
+  async (myForm, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${backend_Url}/password/forgot`, email ,{withCredentials: true});
+      const response = await axios.post(`${backend_Url}/password/forgot`, myForm ,{withCredentials: true});
       return response.data.message;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -147,11 +147,11 @@ export const forgotPassword = createAsyncThunk(
 
 export const resetPassword = createAsyncThunk(
   "user/resetPassword",
-  async ({ token, passwords }, { rejectWithValue }) => {
+  async ({ token, myForm }, { rejectWithValue }) => {
     try {
       const response = await axios.put(
         `${backend_Url}/password/reset/${token}`,
-        passwords,
+        myForm,
         {withCredentials: true}
       );
       return response.data.success;
@@ -166,6 +166,7 @@ export const deleteUser = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await axios.delete(`${backend_Url}/admin/user/${id}` , {withCredentials: true});
+      console.log(response);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -187,9 +188,9 @@ export const getUserDetails = createAsyncThunk(
 
 export const updateUser = createAsyncThunk(
   "user/updateUser",
-  async ({ id, userData }, { rejectWithValue }) => {
+  async ({ userId, myForm }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${backend_Url}/admin/user/${id}`, userData, {withCredentials: true});
+      const response = await axios.put(`${backend_Url}/admin/user/${userId}`, myForm, {withCredentials: true});
       return response.data.success;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -219,6 +220,12 @@ const userSlice = createSlice({
     UPDATE_PROFILE_RESET: (state) => {
       state.isUpdated = false;
     },
+    DELETE_USER_RESET: (state) => {
+      state.isDeleted = false;
+    },
+    UPDATE_USER_RESET: (state) => {
+      state.isUpdated = false;
+    }
   },
   extraReducers: (builder) => {
     // Login, Register, Load User
@@ -283,21 +290,28 @@ const userSlice = createSlice({
         state.error = action.payload;
       });
 
-    // Update Profile, Update Password, Delete User
+    // Update Profile, Update User, Update Password, Delete User
     builder
       .addCase(updateProfile.pending, (state) => {
         state.loading = true;
       })
       .addCase(updateProfile.fulfilled, (state, action) => {
         state.loading = false;
-        // Reset isUpdated to false if the payload is not truth
-        if (!action.payload) {
-          state.isUpdated = false;
-        }
-
         state.isUpdated = action.payload;
       })
       .addCase(updateProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(updateUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isUpdated = action.payload;
+      })
+      .addCase(updateUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
@@ -308,19 +322,11 @@ const userSlice = createSlice({
       .addCase(updatePassword.fulfilled, (state, action) => {
         state.loading = false;
         state.isUpdated = action.payload;
-
-        // Reset isUpdated to false if the payload is not truthy
-        if (!action.payload) {
-          state.isUpdated = false;
-        }
       })
       .addCase(updatePassword.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      // .addCase(updatePassword.UPDATE_PASSWORD_RESET, (state) => {
-
-      // })
 
       .addCase(deleteUser.pending, (state) => {
         state.loading = true;
@@ -328,31 +334,11 @@ const userSlice = createSlice({
       .addCase(deleteUser.fulfilled, (state, action) => {
         state.loading = false;
         state.isDeleted = action.payload.success;
-
-        // Reset isUpdated to false if the payload is not truthy
-        if (!action.payload) {
-          state.isDeleted = false;
-        }
       })
       .addCase(deleteUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
-
-    // Reset Update Profile, Update Password, Update User, Delete User
-    builder
-      // .addCase(updateProfile.fulfilled, (state) => {
-      //   state.isUpdated = false;
-      // })
-      // .addCase(updatePassword.fulfilled, (state) => {
-      //   state.isUpdated = false;
-      // })
-      .addCase(updateUser.fulfilled, (state) => {
-        state.isUpdated = false;
-      });
-    // .addCase(deleteUser.fulfilled, (state) => {
-    //   state.isDeleted = false;
-    // });
 
     // Get All Users
     builder
@@ -416,6 +402,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { clearErrors, UPDATE_PASSWORD_RESET, UPDATE_PROFILE_RESET } =
-  userSlice.actions;
+export const { clearErrors, UPDATE_PASSWORD_RESET, UPDATE_PROFILE_RESET , DELETE_USER_RESET, UPDATE_USER_RESET} = userSlice.actions;
 export default userSlice.reducer;
