@@ -4,11 +4,15 @@ import { backend_Url } from "../server";
 
 export const addItemsToCart = createAsyncThunk(
   "cart/addToCart",
-  async ({ id, quantity }, { rejectWithValue }) => {
+  async ({ id, newQty }, { rejectWithValue }) => {
     try {
+      // const quantity = newQty;
+
       const { data } = await axios.get(`${backend_Url}/product/${id}`, {
         withCredentials: true,
       });
+
+      console.log(newQty);
 
       return {
         product: data.product._id,
@@ -16,7 +20,7 @@ export const addItemsToCart = createAsyncThunk(
         price: data.product.price,
         image: data.product.images[0].url,
         stock: data.product.Stock,
-        quantity,
+        quantity: newQty,
       };
 
       // localStorage.setItem("cartItems", JSON.stringify(getState().cart.cartItems));
@@ -74,7 +78,8 @@ const cartSlice = createSlice({
           state.cartItems = state.cartItems.map((i) =>
             i.product === isItemExist.product ? item : i
           );
-        } else {
+        } 
+        else {
           state.cartItems.push(item);
         }
 
