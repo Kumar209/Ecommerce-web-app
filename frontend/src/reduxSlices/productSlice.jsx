@@ -5,7 +5,8 @@ import { backend_Url } from "../server";
 // Async Thunks
 
 export const getProduct = createAsyncThunk(
-  "product/getProduct", async (data ,{ rejectWithValue }) => {
+  "product/getProduct",
+  async (data, { rejectWithValue }) => {
     try {
       const currentPage = data.currentPage;
       const keyword = data.keyword || "";
@@ -15,7 +16,7 @@ export const getProduct = createAsyncThunk(
         ? `${backend_Url}/products?keyword=${keyword}&page=${currentPage}&category=${category}`
         : `${backend_Url}/products?keyword=${keyword}&page=${currentPage}`;
 
-      const response = await axios.get(link, {withCredentials: true});
+      const response = await axios.get(link, { withCredentials: true });
       return response.data;
     } catch (error) {
       console.log(error);
@@ -29,7 +30,7 @@ export const getAllProduct = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const link = `${backend_Url}/products`;
-      const response = await axios.get(link, {withCredentials: true});
+      const response = await axios.get(link, { withCredentials: true });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -41,7 +42,9 @@ export const getProductDetails = createAsyncThunk(
   "product/getProductDetails",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${backend_Url}/product/${id}`, {withCredentials: true});
+      const response = await axios.get(`${backend_Url}/product/${id}`, {
+        withCredentials: true,
+      });
       return response.data.product;
     } catch (error) {
       return rejectWithValue(error.response.message);
@@ -55,8 +58,8 @@ export const newReview = createAsyncThunk(
     try {
       const response = await axios.post(
         `${backend_Url}/product/review`,
-        reviewData, 
-        {withCredentials: true}
+        reviewData,
+        { withCredentials: true }
       );
       return response.data.success;
     } catch (error) {
@@ -69,14 +72,10 @@ export const createProduct = createAsyncThunk(
   "product/createProduct",
   async (productData, { rejectWithValue }) => {
     try {
-      const config = {
-        headers: { "Content-Type": "application/json" },
-      };
       const response = await axios.post(
         `${backend_Url}/product/new`,
         productData,
-        config,
-        {withCredentials: true}
+        { withCredentials: true }
       );
       return response.data;
     } catch (error) {
@@ -89,7 +88,10 @@ export const getAdminProduct = createAsyncThunk(
   "product/getAdminProduct",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${backend_Url}/admin/products` ,{withCredentials: true});
+      const response = await axios.get(`${backend_Url}/admin/products`, {
+        withCredentials: true,
+      });
+      console.log(response.data);
       return response.data.products;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -101,7 +103,9 @@ export const deleteProduct = createAsyncThunk(
   "product/deleteProduct",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.delete(`${backend_Url}/product/${id}`, {withCredentials: true});
+      const response = await axios.delete(`${backend_Url}/product/${id}`, {
+        withCredentials: true,
+      });
       return response.data.success;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -111,16 +115,12 @@ export const deleteProduct = createAsyncThunk(
 
 export const updateProduct = createAsyncThunk(
   "product/updateProduct",
-  async ({ id, productData }, { rejectWithValue }) => {
+  async ({id, myForm}, { rejectWithValue }) => {
     try {
-      const config = {
-        headers: { "Content-Type": "application/json" },
-      };
       const response = await axios.put(
         `${backend_Url}/product/${id}`,
-        productData,
-        config,
-        {withCredentials: true}
+        myForm,
+        { withCredentials: true }
       );
       return response.data.success;
     } catch (error) {
@@ -133,7 +133,9 @@ export const getAllReviews = createAsyncThunk(
   "product/getAllReviews",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${backend_Url}/reviews?id=${id}`, {withCredentials: true});
+      const response = await axios.get(`${backend_Url}/reviews?id=${id}`, {
+        withCredentials: true,
+      });
       return response.data.reviews;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -146,7 +148,8 @@ export const deleteReviews = createAsyncThunk(
   async ({ reviewId, productId }, { rejectWithValue }) => {
     try {
       const response = await axios.delete(
-        `${backend_Url}/reviews?id=${reviewId}&productId=${productId}`, {withCredentials: true}
+        `${backend_Url}/reviews?id=${reviewId}&productId=${productId}`,
+        { withCredentials: true }
       );
       return response.data.success;
     } catch (error) {
@@ -173,6 +176,18 @@ const productSlice = createSlice({
     NEW_REVIEW_RESET: (state) => {
       state.success = false;
     },
+    NEW_PRODUCT_RESET: (state) => {
+      state.success = false;
+    },
+    DELETE_PRODUCT_RESET: (state) => {
+      state.isDeleted = false;
+    },
+    UPDATE_PRODUCT_RESET: (state) => {
+      state.isUpdated = false;
+    },
+    DELETE_REVIEW_RESET: (state) => {
+      state.isDeleted = false;
+    }
   },
   extraReducers: (builder) => {
     // Get Product
@@ -333,5 +348,12 @@ const productSlice = createSlice({
   },
 });
 
-export const { clearErrors, NEW_REVIEW_RESET } = productSlice.actions;
+export const {
+  clearErrors,
+  NEW_REVIEW_RESET,
+  NEW_PRODUCT_RESET,
+  DELETE_PRODUCT_RESET,
+  UPDATE_PRODUCT_RESET,
+  DELETE_REVIEW_RESET
+} = productSlice.actions;
 export default productSlice.reducer;
