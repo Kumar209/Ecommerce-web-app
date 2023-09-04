@@ -8,10 +8,9 @@ import { Link } from "react-router-dom";
 import "./LoginSignup.css";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../more/Loader";
-import { clearErrors, login, register } from "../../reduxSlices/userSlice";
+import { clearErrors, login, register, logout } from "../../reduxSlices/userSlice";
 import MetaData from "../../more/Metadata";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const LoginSignup = () => {
@@ -20,9 +19,7 @@ const LoginSignup = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { error, loading, isAuthenticated } = useSelector(
-    (state) => state.user
-  );
+  const { error, loading, isAuthenticated } = useSelector((state) => state.user);
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -97,8 +94,8 @@ const LoginSignup = () => {
       // navigate(redirect);
       navigate("/");
     }
-    //   }, [dispatch, error, alert, history, isAuthenticated]);
-  }, [dispatch, error]);
+
+  }, [dispatch, error, isAuthenticated]);
 
 
   const switchTabs = (e, tab) => {
@@ -221,18 +218,6 @@ const LoginSignup = () => {
           </div>
 
           <div></div>
-
-          <ToastContainer
-            position="top-center"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
         </>
       )}
     </>
