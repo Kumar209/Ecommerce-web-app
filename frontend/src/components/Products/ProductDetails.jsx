@@ -62,7 +62,7 @@ const ProductDetails = () => {
 
   useEffect(() => {
     if (error) {
-      alert.error(error);
+      toast.error(error);
       dispatch(clearErrors());
     }
     dispatch(getProductDetails(id));
@@ -94,7 +94,9 @@ const ProductDetails = () => {
 
   const addToCartHandler = () => {
     if (product.Stock > 0) {
-      dispatch(addItemsToCart({ id, quantity }));
+      const newQty = quantity;
+      // dispatch(addItemsToCart({ id, quantity }));
+      dispatch(addItemsToCart({ id, newQty }));
       toast.success("Product Added to cart");
     } else {
       toast.error("Product stock limited");
