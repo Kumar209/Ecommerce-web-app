@@ -23,22 +23,23 @@ const Cart = () => {
   let totalPrice = Price;
 
   const increaseQuantity = (id, quantity, stock) => {
-    // const newQty = quantity + 1;
-    quantity = quantity + 1;
+    const newQty = quantity + 1;
+    // quantity = quantity + 1;
     if (stock <= quantity) {
       return toast.error("Product Stock Limited");
     }
-    // dispatch(addItemsToCart({id, newQty}));
-    dispatch(addItemsToCart({id, quantity}));
+    dispatch(addItemsToCart({id, newQty}));
+    // dispatch(addItemsToCart({id, quantity}));
   };
 
   const decreaseQuantity = (id, quantity) => {
-    quantity = quantity - 1;
+    const newQty = quantity - 1;
     // if (1 >= quantity) {
     if (quantity <=0) {
       return;
     }
-    dispatch(addItemsToCart({id, quantity}));
+    dispatch(addItemsToCart({id, newQty}));
+    // dispatch(addItemsToCart({id, quantity}));
   };
 
   const deleteCartItems = (id) => {
@@ -79,7 +80,11 @@ const Cart = () => {
                     >
                       -
                     </button>
+
+                    {console.log(item)}
+
                     <input type="number" readOnly value={item.quantity} />
+
                     <button
                       onClick={() =>
                         increaseQuantity(
