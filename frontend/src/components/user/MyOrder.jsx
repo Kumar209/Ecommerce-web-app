@@ -26,11 +26,14 @@ const MyOrder = () => {
       headerName: "Status",
       minWidth: 150,
       flex: 0.5,
-      cellClassName: (params) => {
-        return params.getValue(params.id, "status") === "Delivered"
-          ? "greenColor"
-          : "redColor";
-      },
+      // cellClassName: (params) => {
+      //   return params.getValue(params.id, "status") === "Delivered"
+      //     ? "greenColor"
+      //     : "redColor";
+      // },
+      className: (params) =>{
+        return params.status === "Delivered" ? "greenColor": "redColor";
+      }
     },
     {
       field: "itemsQty",
@@ -57,7 +60,7 @@ const MyOrder = () => {
       sortable: false,
       renderCell: (params) => {
         return (
-          <Link to={`/order/${params.getValue(params.id, "id")}`}>
+          <Link to={`/order/${params.id}`}>
             <LaunchIcon />
           </Link>
         );
