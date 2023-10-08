@@ -35,17 +35,17 @@ import Payment from "./components/cart/Payment.jsx";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 
-// import Dashboard from './components/Admin/Dashboard';
-// import CreateProduct from './components/Admin/CreateProduct';
-// import AllProducts from "../../frontend/src/components/Admin/AllProducts";
-// import EditProduct from "../../frontend/src/components/Admin/EditProduct";
-// import AllOrder from "../../frontend/src/components/Admin/AllOrder";
-// import UpdateOrder from "../../frontend/src/components/Admin/UpdateOrder";
-// import AllUsers from "../../frontend/src/components/Admin/AllUsers";
-// import UpdateUser from "../../frontend/src/components/Admin/UpdateUser";
-// import AllReviews from "../../frontend/src/components/Admin/AllReviews";
-// import ForgotPassword from "../../frontend/src/components/user/ForgotPassword";
-// import ResetPassword from "../../frontend/src/components/user/ResetPassword";
+import Dashboard from './components/Admin/Dashboard.jsx';
+import CreateProduct from './components/Admin/CreateProduct.jsx';
+import AllProducts from "../../frontend/src/components/Admin/AllProducts.jsx";
+import EditProduct from "../../frontend/src/components/Admin/EditProduct.jsx";
+import AllOrder from "../../frontend/src/components/Admin/AllOrder.jsx";
+import UpdateOrder from "../../frontend/src/components/Admin/UpdateOrder.jsx";
+import AllUsers from "../../frontend/src/components/Admin/AllUsers.jsx";
+import UpdateUser from "../../frontend/src/components/Admin/UpdateUser.jsx";
+import AllReviews from "../../frontend/src/components/Admin/AllReviews.jsx";
+import ForgotPassword from "../../frontend/src/components/user/ForgotPassword.jsx";
+import ResetPassword from "../../frontend/src/components/user/ResetPassword.jsx";
 import Notfound from "../../frontend/src/more/Notfound.jsx";
 import { backend_Url } from "./server";
 
@@ -58,9 +58,7 @@ const App = () => {
   const [stripeApiKey, setStripeApiKey] = useState("");
 
   async function getStripeApiKey() {
-    const { data } = await axios.get(`${backend_Url}/stripeapikey`, {
-      withCredentials: true,
-    });
+    const { data } = await axios.get(`${backend_Url}/stripeapikey`, {withCredentials: true,});
 
     setStripeApiKey(data.stripeApiKey);
   }
@@ -97,9 +95,10 @@ const App = () => {
           <Route exact path="/cart" element={<Cart />} />
           <Route exact path="/favourites" element={<Favourites />} />
           <Route exact path="/creator" element={<CommingSoon />} />
+          <Route exact path="/password/forgot" element={<ForgotPassword />} />
+         <Route exact path="/password/reset/:token" element={<ResetPassword />} />
 
           {/* Protected Routes */}
-
           <Route exact path="/me" element={<ProtectedRoute> <Profile /> </ProtectedRoute>} />
           <Route exact path="/me/update" element={<ProtectedRoute> <UpdatePassword /> </ProtectedRoute>} />
           <Route exact path="/me/update/info" element={<ProtectedRoute> <EditProfile /> </ProtectedRoute>} />
@@ -108,6 +107,24 @@ const App = () => {
           <Route exact path="/success" element={<ProtectedRoute> <Success /> </ProtectedRoute>} />
           <Route exact path="/orders" element={<ProtectedRoute> <MyOrder /> </ProtectedRoute>} />
           <Route exact path="/order/:id" element={<ProtectedRoute> <MyOrderDetails /> </ProtectedRoute>} />
+
+
+          {/* Protected Routes only for admin  */}
+          {/* error  */}
+         <Route exact path="/dashboard"  isAdmin={true}   element={<ProtectedRoute> <Dashboard /> </ProtectedRoute>} />  
+
+         <Route exact path="/admin/product"  isAdmin={true}  element={<ProtectedRoute > <CreateProduct /> </ProtectedRoute>} />
+         <Route exact path="/admin/products"  isAdmin={true}  element={<ProtectedRoute > <AllProducts /> </ProtectedRoute> } />
+         <Route exact path="/edit/product/:id"  isAdmin={true}  element={<ProtectedRoute ><EditProduct /> </ProtectedRoute>} />
+         <Route exact path="/admin/orders"  isAdmin={true}  element={<ProtectedRoute > <AllOrder /> </ProtectedRoute>} />
+         <Route exact path="/admin/order/:id"  isAdmin={true}  element={<ProtectedRoute ><UpdateOrder /> </ProtectedRoute>} />
+
+          {/* error  */}
+         <Route exact path="/admin/users"  isAdmin={true}  element={<ProtectedRoute ><AllUsers /> </ProtectedRoute>} />
+         <Route exact path="/admin/user/:id"  isAdmin={true}  element={<ProtectedRoute ><UpdateUser /> </ProtectedRoute>} />
+         <Route exact path="/admin/reviews"  isAdmin={true}  element={<ProtectedRoute ><AllReviews /> </ProtectedRoute>} />
+
+
 
 
           {/* Stripe route  */}

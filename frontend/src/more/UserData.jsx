@@ -22,6 +22,7 @@ const UserData = ({ user }) => {
   const { cartItems } = useSelector((state) => state.cart);
   const { favouriteItems } = useSelector((state) => state.favourite);
 
+
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -37,46 +38,72 @@ const UserData = ({ user }) => {
 
   const dispatch = useDispatch();
 
-  const options = [
+  const userOption = [
     { icon: <HomeIcon />, name: "Home", func: home },
     { icon: <ListAltIcon />, name: "Orders", func: orders },
+
     {
-      icon: (
-        <ShoppingCartIcon
-          style={{
-            color: cartItems.length === 0 ? "" : "tomato",
-          }}
-        />
-      ),
+      icon: (<ShoppingCartIcon style={{color: cartItems.length === 0 ? "" : "tomato",}} />),
       name: `Cart (${cartItems.length})`,
       func: cart,
-    },
-    {
-      icon: (
-        <HeartIcon
-          style={{
-            color: favouriteItems.length === 0 ? "" : "tomato",
-          }}
-        />
-      ),
-      name: `Favourite (${favouriteItems.length})`,
-      func: favourite,
-    },
-    { icon: <PersonIcon />, name: "Profile", func: account },
-    { icon: <Support />, name: "Report us", func: report },
-    { icon: <ExitToAppIcon />, name: "Logout", func: logoutUser },
+  },
+  {
+    icon: (<HeartIcon style={{ color: favouriteItems.length === 0 ? "" : "tomato",}}/>),
+    name: `Favourite (${favouriteItems.length})`,
+    func: favourite,
+  },
+
+  { icon: <PersonIcon />, name: "Profile", func: account },
+  { icon: <Support />, name: "Report us", func: report },
+  { icon: <ExitToAppIcon />, name: "Logout", func: logoutUser },
   ];
 
-  if (user.role === "admin") {
-    options.unshift({
-      icon: <DashboardIcon />,
-      name: "Dashboard",
-      func: dashboard,
-    });
-  }
+  const adminOption = [
+    {icon: <DashboardIcon />,name: "Dashboard", func: dashboard},
+    { icon: <HomeIcon />, name: "Home", func: home },
+    { icon: <ListAltIcon />, name: "Orders", func: orders },
+    { icon: <PersonIcon />, name: "Profile", func: account },
+    { icon: <ExitToAppIcon />, name: "Logout", func: logoutUser },
+  ]
+
+  // const options = [
+  //   { icon: <HomeIcon />, name: "Home", func: home },
+  //   { icon: <ListAltIcon />, name: "Orders", func: orders },
+    
+  //   {
+  //       icon: (<ShoppingCartIcon style={{color: cartItems.length === 0 ? "" : "tomato",}} />),
+  //       name: `Cart (${cartItems.length})`,
+  //       func: cart,
+  //   },
+  //   {
+  //     icon: (<HeartIcon style={{ color: favouriteItems.length === 0 ? "" : "tomato",}}/>),
+  //     name: `Favourite (${favouriteItems.length})`,
+  //     func: favourite,
+  //   },
+
+  //   { icon: <PersonIcon />, name: "Profile", func: account },
+  //   { icon: <Support />, name: "Report us", func: report },
+  //   { icon: <ExitToAppIcon />, name: "Logout", func: logoutUser },
+  // ];
+
+  // if (user.role === "admin") {
+  //   options.unshift({
+  //     icon: <DashboardIcon />,
+  //     name: "Dashboard",
+  //     func: dashboard,
+  //   });
+  // }
+
+  // if (user.role === "Creator") {
+  //   options.unshift({
+  //     icon: <DashboardIcon />,
+  //     name: "Dashboard",
+  //     func: dashboard,
+  //   });
+  // }
 
   if (user.role === "Creator") {
-    options.unshift({
+    userOption.unshift({
       icon: <DashboardIcon />,
       name: "Dashboard",
       func: dashboard,
@@ -86,12 +113,21 @@ const UserData = ({ user }) => {
   function dashboard() {
     navigate("/dashboard");
   }
+
   function home() {
     navigate("/");
   }
-  function orders() {
-    navigate("/orders");
+
+  function orders(){
+    if(user.role === "admin"){
+      navigate("/admin/orders");
+    }
+    else{
+      navigate("/orders");
+    }
+    
   }
+
   function cart() {
     navigate("/cart");
   }
@@ -134,7 +170,8 @@ const UserData = ({ user }) => {
           />
         }
       >
-        {options.map((item) => (
+        {user.role === "admin" ? 
+        (adminOption.map((item) => (
           <SpeedDialAction
             key={item.name}
             icon={item.icon}
@@ -142,19 +179,18 @@ const UserData = ({ user }) => {
             onClick={item.func}
             tooltipOpen={false}
           />
-        ))}
+        ))) :
+        (userOption.map((item) => (
+          <SpeedDialAction
+            key={item.name}
+            icon={item.icon}
+            tooltipTitle={item.name}
+            onClick={item.func}
+            tooltipOpen={false}
+          />
+        )))
+      }
       </SpeedDial>
-      {/* <ToastContainer
-        position="bottom-center"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      /> */}
     </>
   );
 };

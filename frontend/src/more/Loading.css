@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+/* @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
 .loading{
     background-color: #000;
     height: 100vh;
@@ -78,4 +78,14 @@ input:checked ~ label{
   animation: none;
   border-color: #5cb85c;
   transition: border 0.5s ease-out;
+} */
+
+
+
+.loader{
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

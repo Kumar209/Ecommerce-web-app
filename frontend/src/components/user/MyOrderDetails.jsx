@@ -2,18 +2,21 @@ import React, { useEffect } from "react";
 import "./orderDetails.css";
 import { useSelector, useDispatch } from "react-redux";
 import MetaData from "../../more/Metadata";
-import { Link } from "react-router-dom";
+import { Link , useParams } from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import { getOrderDetails, clearErrors } from "../../reduxSlices/orderSlice";
 import Loading from "../../more/Loader";
 import BottomTab from "../../more/BottomTab";
 
-const MyOrderDetails = ({ match }) => {
+const MyOrderDetails = () => {
   const { order, error, loading } = useSelector(
     (state) => state.order
   );
 
   const dispatch = useDispatch();
+
+  const { id } = useParams();
+
 
   useEffect(() => {
     if (error) {
@@ -21,8 +24,9 @@ const MyOrderDetails = ({ match }) => {
       dispatch(clearErrors());
     }
 
-    dispatch(getOrderDetails(match.params.id));
-  }, [dispatch, error, match.params.id]);
+    // dispatch(getOrderDetails(match.params.id));
+    dispatch(getOrderDetails(id));
+  }, [dispatch, error, id]);
   return (
     <>
       {loading ? (
