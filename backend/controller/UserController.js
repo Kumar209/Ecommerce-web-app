@@ -94,7 +94,7 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
   //Here we storing another route for reset token which is send with message on user email
   // const resetPasswordUrl = `${req.protocol}://${req.get("host")}/password/reset/${resetToken}`;
-  const resetPasswordUrl = `${req.protocol}://http:localhost:3000/password/reset/${resetToken}`;
+  const resetPasswordUrl = `${req.protocol}://localhost:3000/password/reset/${resetToken}`;
 
 
   const message = `Your password reset token is :- \n\n ${resetPasswordUrl}`;
