@@ -128,7 +128,7 @@ exports.deleteProduct = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Product is not found with this id", 404));
   }
 
-  console.log(product.images[0].public_id)
+  // console.log(product.images[0].public_id)
 
 
   // Deleting images from cloudinary

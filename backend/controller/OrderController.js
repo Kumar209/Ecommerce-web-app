@@ -5,7 +5,6 @@ const Product = require("../models/ProductModel");
 
 // Create Order
 exports.createOrder = catchAsyncErrors(async (req, res, next) => {
-  console.log(req.body);
 
   const {
     shippingInfo,
