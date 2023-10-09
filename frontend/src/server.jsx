@@ -1,1 +1,1 @@
-export const backend_Url = "http://localhost:4000/api/v2";
+export const backend_Url = "https://ecommerce-server-hiln.onrender.com/api/v2";
