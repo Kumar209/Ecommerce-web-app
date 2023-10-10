@@ -13,7 +13,3 @@ root.render(
   </Provider>
 
 );
-
-
-    // "@material-ui/lab": "^4.0.3",
-    // "react": "^18.2.0",
